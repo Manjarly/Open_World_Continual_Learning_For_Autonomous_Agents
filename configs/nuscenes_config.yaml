@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────────
+# Phase 2 — nuScenes (Target Domain / New Task)
+# ─────────────────────────────────────────────
+
+defaults:
+  - base_config
+
+dataset:
+  name: "nuscenes"
+  raw_path: "data/nuscenes/"
+  processed_path: "data/processed/nuscenes/"
+  version: "v1.0-trainval"   # or "v1.0-mini" for quick runs
+  splits:
+    train: "data/processed/nuscenes/train/"
+    val:   "data/processed/nuscenes/val/"
+    test:  "data/processed/nuscenes/test/"
+
+  # nuScenes → shared label space mapping
+  class_map:
+    "car":                "vehicle"
+    "truck":              "vehicle"
+    "bus":                "vehicle"
+    "motorcycle":         "cyclist"
+    "bicycle":            "cyclist"
+    "pedestrian":         "pedestrian"
+    "traffic_cone":       "sign"
+    "barrier":            "unknown"      # treated as open-set candidate
+
+  modalities:
+    - camera              # 6 surround cameras
+    - lidar               # 32-beam LiDAR
+
+training:
+  epochs: 30
+  batch_size: 16
+  checkpoint_name: "continual_ewc"
+
+# EWC (Phase 2)
+ewc:
+  lambda: 0.4             # Regularization strength (tune between 0.1 – 1.0)
+  fisher_samples: 200     # Samples to estimate Fisher Information Matrix
+
+# Open-Set Recognition (Phase 2)
+openset:
+  enabled: true
+  uncertainty_metric: "entropy"   # "entropy" | "max_softmax" | "energy"
+  threshold: 0.6                  # Flag as unknown if uncertainty > threshold
+  calibration_split: "val"
+
+# EDA settings
+eda:
+  sample_size: 500
+  plot_class_dist: true
+  plot_sensor_coverage: true
+  output_dir: "notebooks/eda_outputs/nuscenes/"

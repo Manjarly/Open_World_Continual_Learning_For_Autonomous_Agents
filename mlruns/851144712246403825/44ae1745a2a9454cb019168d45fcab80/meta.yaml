@@ -1,0 +1,14 @@
+artifact_uri: /Users/manjarly/Amit's Data/ASU-MS_DSAE/SEM 4/owcl_project/mlruns/851144712246403825/44ae1745a2a9454cb019168d45fcab80/artifacts
+end_time: 1772652902592
+entry_point_name: ''
+experiment_id: '851144712246403825'
+lifecycle_stage: active
+run_id: 44ae1745a2a9454cb019168d45fcab80
+run_name: phase2_continual_ewc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1772652902579
+status: 3
+tags: []
+user_id: manjarly

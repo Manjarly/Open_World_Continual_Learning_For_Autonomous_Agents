@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────
+# Base configuration — shared across all tasks
+# ─────────────────────────────────────────────
+
+project:
+  name: "owcl-autonomous-agents"
+  team: "Delaware"
+  mlflow_experiment: "owcl_experiments"
+  mlflow_tracking_uri: "mlruns"
+
+training:
+  seed: 42
+  device: "cuda"           # "cpu" for CPU-only
+  epochs: 50
+  batch_size: 16
+  num_workers: 4
+  img_size: 640
+  lr: 0.001
+  weight_decay: 0.0005
+  patience: 10             # Early stopping patience
+
+model:
+  architecture: "yolov8m"  # yolov8n / yolov8s / yolov8m / yolov8l
+  pretrained: true
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+
+paths:
+  checkpoints: "runs/"
+  logs: "logs/"
+  processed_data: "data/processed/"
+
+logging:
+  log_every_n_steps: 10
+  save_top_k: 3

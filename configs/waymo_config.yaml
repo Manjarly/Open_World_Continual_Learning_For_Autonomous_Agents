@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────
+# Phase 1 — Waymo (Source Domain / Base Task)
+# ─────────────────────────────────────────────
+
+defaults:
+  - base_config
+
+dataset:
+  name: "waymo"
+  raw_path: "data/waymo/"
+  processed_path: "data/processed/waymo/"
+  splits:
+    train: "data/processed/waymo/train/"
+    val:   "data/processed/waymo/val/"
+    test:  "data/processed/waymo/test/"
+  train_ratio: 0.8
+  val_ratio:   0.1
+  test_ratio:  0.1
+
+  # Waymo class mapping → COCO-compatible labels
+  class_map:
+    1: "vehicle"
+    2: "pedestrian"
+    3: "cyclist"
+    4: "sign"
+
+  # Sensor modalities to use
+  modalities:
+    - camera          # Front, side cameras
+    - lidar           # Top LiDAR (optional projection)
+
+training:
+  epochs: 50
+  batch_size: 16
+  checkpoint_name: "waymo_baseline"
+
+# EDA settings (Phase 1)
+eda:
+  sample_size: 1000       # Frames to sample for EDA
+  plot_class_dist: true
+  plot_bbox_stats: true
+  output_dir: "notebooks/eda_outputs/waymo/"

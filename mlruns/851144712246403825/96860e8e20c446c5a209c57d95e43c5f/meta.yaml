@@ -1,0 +1,14 @@
+artifact_uri: /Users/manjarly/Amit's Data/ASU-MS_DSAE/SEM 4/owcl_project/mlruns/851144712246403825/96860e8e20c446c5a209c57d95e43c5f/artifacts
+end_time: 1772649086969
+entry_point_name: ''
+experiment_id: '851144712246403825'
+lifecycle_stage: active
+run_id: 96860e8e20c446c5a209c57d95e43c5f
+run_name: phase1_waymo_baseline
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1772643922388
+status: 3
+tags: []
+user_id: manjarly

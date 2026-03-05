@@ -1,0 +1,7 @@
+path: /Users/manjarly/Amit Data/ASU-MS_DSAE/SEM 4/owcl_project/data/processed/waymo
+train: images/train
+val:   images/val
+test:  images/test
+
+nc: 4
+names: ['vehicle', 'pedestrian', 'cyclist', 'sign']
