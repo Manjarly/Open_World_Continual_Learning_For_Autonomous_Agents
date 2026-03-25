@@ -4,7 +4,6 @@ torchvision>=0.16.0
 ultralytics>=8.0.200       # YOLOv8
 
 # Data
-waymo-open-dataset-tf-2-12-0  # Waymo SDK
 nuscenes-devkit>=1.1.11
 numpy>=1.24.0
 pandas>=2.0.0
@@ -43,3 +42,6 @@ ipykernel>=6.25.0
 fastapi
 uvicorn
 python-multipart
+streamlit
+requests
+opencv-python-headless

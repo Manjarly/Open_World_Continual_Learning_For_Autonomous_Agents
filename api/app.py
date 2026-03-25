@@ -36,10 +36,11 @@ def load_model():
     global engine
     print("Loading inference engine...")
     try:
-        # Loading the EWC Continual Learning model by default
+        # Loading the base pre-trained model for real-world testing (80 classes)
         engine = InferenceEngine(
-            checkpoint_path="runs/detect/runs/continual_ewc/weights/best.pt",
-            uncertainty_threshold=0.6
+            checkpoint_path="yolov8m.pt",
+            num_classes=80,
+            uncertainty_threshold=0.8
         )
         print("Model loaded successfully.")
     except Exception as e:
