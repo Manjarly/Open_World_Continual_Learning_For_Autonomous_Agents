@@ -9,6 +9,8 @@ import streamlit as st
 import requests
 from PIL import Image, ImageDraw
 
+import os
+
 # Mapping class IDs to human-readable names based on the Colab notebook
 CLASS_NAMES = {
     0: "Pedestrian",
@@ -18,7 +20,8 @@ CLASS_NAMES = {
     -1: "UNKNOWN"
 }
 
-API_URL = "http://localhost:8000/predict"
+# Use environment variable to support Docker routing (http://api:8000/predict)
+API_URL = os.getenv("API_URL", "http://localhost:8000/predict")
 
 st.set_page_config(page_title="OWCL Autonomous Agents", layout="wide")
 
