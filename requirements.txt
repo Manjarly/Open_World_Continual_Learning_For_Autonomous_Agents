@@ -38,3 +38,8 @@ pytest-cov>=4.1.0
 # Notebooks
 jupyter>=1.0.0
 ipykernel>=6.25.0
+
+# Phase 3 Deployment Dependencies
+fastapi
+uvicorn
+python-multipart
