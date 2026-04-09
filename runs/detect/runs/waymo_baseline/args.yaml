@@ -106,4 +106,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: /Users/manjarly/Amit Data/ASU-MS_DSAE/SEM 4/owcl_project/runs/detect/runs/waymo_baseline
+save_dir: /Users/manjarly/Amit Data/ASU-MS_DSAE/SEM 4/Work/Open_World_Continual_Learning_For_Autonomous_Agents/runs/detect/runs/waymo_baseline
