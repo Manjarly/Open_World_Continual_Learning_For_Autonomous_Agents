@@ -1,5 +1,5 @@
 # Open-World Continual Learning for Autonomous Agents
-### Team Delaware
+
 
 A deep learning framework that integrates **Open-Set Recognition** and **Continual Learning** for autonomous vehicle perception — enabling agents to detect unknown objects and adapt to new environments without catastrophic forgetting.
 
