@@ -7,38 +7,36 @@
 ## Top-Left: Latest Accomplishments & KPIs
 *What we have achieved so far*
 
-- **Phase 1 Complete:** Baseline YOLOv8 model successfully trained on the Waymo Open Dataset (Source Domain).
-- **Phase 2 Complete:** Continual Learning pipeline implemented using Elastic Weight Consolidation (EWC) on the nuScenes dataset (Target Domain) to mitigate catastrophic forgetting.
-- **Open-Set Recognition:** Entropy-based uncertainty scoring implemented to detect "unknown" objects.
-- **MLOps & Tracking:** Experiment tracking established using MLflow, with data versioning set up via DVC.
-- **Prototyping:** End-to-end pipeline tested and validated in a self-contained Google Colab environment.
+- **Phase 1 Complete:** Baseline YOLOv8 detector trained on Waymo Open Dataset (Source Domain).
+- **Phase 2 Complete:** Continual Learning pipeline with Elastic Weight Consolidation (EWC) on nuScenes dataset (Target Domain) to prevent catastrophic forgetting.
+- **Open-Set Recognition:** Entropy, Max Softmax, and Energy-based uncertainty scoring implemented to detect "unknown" obstacles.
+- **Phase 3 Complete:** Built FastAPI backend (`api/app.py`), modern multi-tab Streamlit dashboard (`ui/app.py`), and visualization utilities (`src/utils/visualization.py`).
+- **MLOps & Quality:** 43 automated unit tests passing across loaders, EWC, uncertainty detection, and visualization.
 
 ---
 
 ## Top-Right: Major Next Tasks (RAIL)
 *Immediate action items and ownership*
 
-- **Containerization (Amit):** Dockerize the entire application (training and inference pipelines) to ensure cross-environment consistency.
-- **API Development (Amit/Shreyas):** Build a FastAPI backend to serve model predictions in real-time.
-- **UI & Integration (Shreyas):** Develop a frontend user interface and integrate it smoothly with the FastAPI backend.
-- **Testing & QA (Sudamshu):** Conduct rigorous testing of the integrated model outputs against ground truth data.
+- **Docker Stack Finalization (Amit):** Build & test full stack (`docker-compose up --build`).
+- **End-to-End Field Validation (Sudamshu/Shreyas):** Conduct benchmark testing against nuScenes validation splits.
+- **Final Report & Paper (Aditya/Shreyas):** Consolidate findings into final project report & presentation slides.
 
 ---
 
 ## Bottom-Left: Major Risks, Barriers, & Obstacles
 *Potential roadblocks we are monitoring*
 
-- **Environment Inconsistency:** Risk of dependency conflicts between team members' machines. *(Mitigation: Strict adherence to Docker containerization).*
-- **Integration Bottlenecks:** Delays integrating the ML tracking (MLflow), backend (FastAPI), and frontend (UI). *(Mitigation: Daily monitoring of the GitHub Project board).*
-- **Data Quality & Pipeline Issues:** Ensuring the synthetic/mock data pipelines scale correctly when transitioned to full local datasets. *(Mitigation: Strict preprocessing checks by the Data Engineer).*
-- **Performance Overhead:** The EWC and uncertainty calculations might introduce latency during real-time inference.
+- **Environment Inconsistency:** Risk of dependency conflicts across host machines. *(Mitigation: Strict Docker containerization).*
+- **Inference Latency:** High-resolution entropy calculations during real-time stream inference. *(Mitigation: Dynamic thresholding and vectorized matrix operations).*
+- **Data Quality:** Ensuring seamless handling when transitioning between raw Waymo TFRecords and nuScenes annotations.
 
 ---
 
 ## Bottom-Right: Remaining Major Activities & Timeline
 *The path to completion (Phase 3 & 4)*
 
-- **Weeks 6-8: API & Containerization:** Finalize Docker setups and build the FastAPI endpoints.
-- **Week 9: UI Development:** Complete the frontend dashboard for visualizing "unknown" object detection and model metrics.
-- **Week 10: End-to-End Testing:** System integration testing, bug fixing, and final validation.
-- **Weeks 10+: Final Reporting:** Consolidate findings, complete the Overleaf (LaTeX) documentation, and prepare the final project presentation.
+- **Phase 1 & 2 (Weeks 1–5):** Model training, EWC continual learning, open-set recognition ✅
+- **Phase 3 (Weeks 6–9):** FastAPI backend, Streamlit Dashboard UI, Visualization engine, Unit testing ✅
+- **Phase 4 (Weeks 10+):** System integration testing, final benchmark validation, LaTeX report & slides 🔜
+

@@ -84,11 +84,14 @@ def evaluate_openset(
     metric: str = "entropy",
     num_classes: int = 4,
     max_images: int = 200,
+    save_visualizations: bool = False,
+    out_dir: str = "runs/eval_samples",
 ) -> dict:
     """Run open-set detection on val images and return stats + AUROC/AUPR."""
     import glob, random
     from PIL import Image
     import numpy as np
+    from src.utils.visualization import draw_detections
 
     unc_detector = UncertaintyDetector(
         metric=metric,
@@ -105,12 +108,19 @@ def evaluate_openset(
         logger.warning("No validation images found for open-set evaluation.")
         return {}
 
+    if save_visualizations:
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
+
     all_dets = []
-    for p in img_paths:
+    for idx, p in enumerate(img_paths):
         try:
             dets = detector.predict(p, return_probs=True)
             flagged = unc_detector.flag_unknowns(dets)
             all_dets.extend(flagged)
+
+            if save_visualizations and idx < 20:
+                ann_img = draw_detections(p, flagged, show_uncertainty=True)
+                ann_img.save(Path(out_dir) / f"eval_sample_{idx:03d}.jpg")
         except Exception as e:
             logger.debug(f"Skipped {p}: {e}")
 
@@ -125,24 +135,27 @@ def evaluate_openset(
             oc_metrics = compute_openset_metrics(scores, is_unknown_gt)
             stats.update(oc_metrics)
 
+    if save_visualizations and all_dets:
+        logger.info(f"Saved sample open-set visualizations → {out_dir}/")
+
     return stats
 
 
 def print_report(results: dict):
-    print("\n" + "═" * 55)
-    print("  EVALUATION REPORT — Team Delaware")
-    print("═" * 55)
+    print("\n" + "═" * 60)
+    print("  OWCL EVALUATION REPORT — Team Delaware")
+    print("═" * 60)
     for section, data in results.items():
-        print(f"\n  [{section}]")
+        print(f"\n  ▶ [{section}]")
         if isinstance(data, dict):
             for k, v in data.items():
                 if isinstance(v, float):
-                    print(f"    {k:<25} {v:.4f}")
+                    print(f"    • {k:<28} {v:.4f}")
                 else:
-                    print(f"    {k:<25} {v}")
+                    print(f"    • {k:<28} {v}")
         else:
-            print(f"    {data}")
-    print("\n" + "═" * 55)
+            print(f"    • {data}")
+    print("\n" + "═" * 60)
 
 
 def run_evaluation(args):
@@ -193,6 +206,7 @@ def run_evaluation(args):
             threshold=args.threshold,
             metric=args.uncertainty_metric,
             num_classes=len(cfg.get("dataset", {}).get("class_map", {}) or range(4)),
+            save_visualizations=args.save_visualizations,
         )
         results["Open-Set Recognition"] = openset_stats
 
@@ -215,6 +229,7 @@ def parse_args():
     p.add_argument("--dataset",             default="nuscenes",
                    choices=["waymo", "nuscenes", "both"],   help="Dataset to evaluate on")
     p.add_argument("--open_set",            action="store_true", help="Run open-set evaluation")
+    p.add_argument("--save_visualizations", action="store_true", help="Save annotated eval images")
     p.add_argument("--uncertainty_metric",  default="entropy",
                    choices=["entropy", "max_softmax", "energy"])
     p.add_argument("--threshold",           type=float, default=0.6)
