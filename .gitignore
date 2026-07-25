@@ -18,10 +18,13 @@ env/
 # Datasets & Heavy Raw Files
 data/waymo/
 data/nuscenes/
+data/processed/
 *.tfrecord
+*.cache
 *.tar
 *.zip
 *.tar.gz
+
 
 # Model Weights, Training Runs & MLflow Logs
 runs/
