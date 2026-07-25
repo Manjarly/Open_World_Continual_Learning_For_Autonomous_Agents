@@ -1,0 +1,17 @@
+{
+  "1. Detection Performance (nuScenes)": {
+    "mAP50": 0.0,
+    "mAP50_95": 0.0,
+    "precision": 0.0,
+    "recall": 0.0
+  },
+  "2. Continual Learning & Forgetting": {
+    "Note": "Pass --baseline_checkpoint to evaluate Task A (Waymo) retention drop."
+  },
+  "3. Open-Set Recognition & Uncertainty": {
+    "n_detections": 0,
+    "status": "No bounding box predictions above confidence threshold.",
+    "threshold": 0.6,
+    "metric": "entropy"
+  }
+}
