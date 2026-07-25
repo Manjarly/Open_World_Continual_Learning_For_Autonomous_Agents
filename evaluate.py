@@ -84,6 +84,7 @@ def evaluate_openset(
     metric: str = "entropy",
     num_classes: int = 4,
     max_images: int = 200,
+    conf_threshold: float = 0.05,
     save_visualizations: bool = False,
     out_dir: str = "runs/eval_samples",
 ) -> dict:
@@ -100,13 +101,13 @@ def evaluate_openset(
     )
 
     val_dir   = Path(dataset_processed_path) / "images" / "val"
-    img_paths = sorted(glob.glob(f"{val_dir}/*.jpg"))
+    img_paths = sorted(glob.glob(f"{val_dir}/*.jpg")) + sorted(glob.glob(f"{val_dir}/*.png"))
     if len(img_paths) > max_images:
         img_paths = random.sample(img_paths, max_images)
 
     if not img_paths:
         logger.warning("No validation images found for open-set evaluation.")
-        return {}
+        return {"n_detections": 0, "status": "No validation images found"}
 
     if save_visualizations:
         Path(out_dir).mkdir(parents=True, exist_ok=True)
@@ -114,31 +115,40 @@ def evaluate_openset(
     all_dets = []
     for idx, p in enumerate(img_paths):
         try:
-            dets = detector.predict(p, return_probs=True)
+            dets = detector.predict(p, conf_threshold=conf_threshold, return_probs=True)
             flagged = unc_detector.flag_unknowns(dets)
             all_dets.extend(flagged)
 
-            if save_visualizations and idx < 20:
+            if save_visualizations and idx < 20 and flagged:
                 ann_img = draw_detections(p, flagged, show_uncertainty=True)
                 ann_img.save(Path(out_dir) / f"eval_sample_{idx:03d}.jpg")
         except Exception as e:
             logger.debug(f"Skipped {p}: {e}")
 
+    if not all_dets:
+        logger.warning("No detections found during open-set evaluation.")
+        return {
+            "n_detections": 0,
+            "status": "No bounding box predictions above confidence threshold.",
+            "threshold": threshold,
+            "metric": metric,
+        }
+
     stats = unc_detector.compute_stats(all_dets)
 
     # Compute AUROC/AUPR using uncertainty score as open-set discriminator
-    if all_dets:
-        scores = [d.get("uncertainty", 0.0) for d in all_dets]
-        # For evaluation, label barrier/unknown class as truly unknown
-        is_unknown_gt = [d.get("cls", 0) in (-1, 4) for d in all_dets]
-        if any(is_unknown_gt):
-            oc_metrics = compute_openset_metrics(scores, is_unknown_gt)
-            stats.update(oc_metrics)
+    scores = [d.get("uncertainty", 0.0) for d in all_dets]
+    # For evaluation, label barrier/unknown class as truly unknown
+    is_unknown_gt = [d.get("cls", 0) in (-1, 4) for d in all_dets]
+    if any(is_unknown_gt) and len(set(is_unknown_gt)) > 1:
+        oc_metrics = compute_openset_metrics(scores, is_unknown_gt)
+        stats.update(oc_metrics)
 
     if save_visualizations and all_dets:
         logger.info(f"Saved sample open-set visualizations → {out_dir}/")
 
     return stats
+
 
 
 def print_report(results: dict):

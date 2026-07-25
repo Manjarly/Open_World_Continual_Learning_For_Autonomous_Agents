@@ -19,13 +19,34 @@ engine = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load model weights safely on server startup."""
+    """Load model weights safely on server startup, favoring fine-tuned checkpoints."""
     global engine
-    print("Loading OWCL inference engine...")
+    import os
+    
+    # Auto-resolve checkpoint: MODEL_PATH env -> trained checkpoints -> base yolov8m.pt
+    env_ckpt = os.getenv("MODEL_PATH")
+    possible_ckpts = [
+        env_ckpt,
+        "runs/detect/runs/continual_ewc/weights/best.pt",
+        "runs/detect/runs/waymo_baseline/weights/best.pt",
+        "runs/continual_ewc/weights/best.pt",
+        "runs/waymo_baseline/weights/best.pt",
+        "yolov8m.pt"
+    ]
+    
+    checkpoint_path = "yolov8m.pt"
+    for ckpt in possible_ckpts:
+        if ckpt and os.path.exists(ckpt):
+            checkpoint_path = ckpt
+            break
+            
+    num_classes = 80 if checkpoint_path.endswith("yolov8m.pt") else 5
+    print(f"Loading OWCL inference engine with checkpoint: {checkpoint_path} (Classes: {num_classes})...")
+    
     try:
         engine = InferenceEngine(
-            checkpoint_path="yolov8m.pt",
-            num_classes=80,
+            checkpoint_path=checkpoint_path,
+            num_classes=num_classes,
             uncertainty_threshold=0.6,
             uncertainty_metric="entropy"
         )
@@ -34,6 +55,7 @@ async def lifespan(app: FastAPI):
         print(f"Failed to load model: {e}")
     yield
     print("Shutting down OWCL inference engine...")
+
 
 app = FastAPI(
     title="OWCL Autonomous Agents API",

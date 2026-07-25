@@ -45,9 +45,11 @@ def setup_mlflow(
     experiment_name: str = "owcl_experiments",
     tracking_uri:    str = "mlruns",
 ) -> Optional[str]:
+    os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
     mlf = _try_import_mlflow()
     if not mlf:
         logger.warning("MLflow not available — skipping setup.")
+
         return None
 
     mlf.set_tracking_uri(tracking_uri)

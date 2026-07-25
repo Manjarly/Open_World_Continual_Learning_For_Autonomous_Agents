@@ -162,55 +162,6 @@ Packaged via `docker-compose.yml`:
 
 ---
 
-## 📁 Repository Structure
-
-```
-owcl_project/
-├── api/
-│   └── app.py                # FastAPI REST service
-├── ui/
-│   └── app.py                # Streamlit web UI dashboard
-├── configs/
-│   ├── base_config.yaml      # General hyperparameters
-│   ├── waymo_config.yaml     # Task A (Waymo) config
-│   └── nuscenes_config.yaml  # Task B (nuScenes + EWC) config
-├── data/
-│   ├── waymo/                # Raw Waymo files (git-ignored)
-│   ├── nuscenes/             # Raw nuScenes files (git-ignored)
-│   └── processed/            # Processed splits (DVC-tracked)
-├── src/
-│   ├── data/
-│   │   ├── waymo_loader.py   # Waymo dataset parser
-│   │   ├── nuscenes_loader.py# nuScenes dataset parser
-│   │   └── transforms.py     # Image augmentation pipeline
-│   ├── models/
-│   │   └── yolo_detector.py  # YOLOv8 model wrapper & trainer
-│   ├── continual/
-│   │   └── ewc.py            # Elastic Weight Consolidation module
-│   ├── openset/
-│   │   └── uncertainty.py    # Entropy & energy uncertainty flagger
-│   ├── utils/
-│   │   ├── mlflow_utils.py   # MLflow experiment tracking helpers
-│   │   ├── metrics.py        # mAP, forgetting & open-set metrics
-│   │   └── visualization.py  # Image annotation & histogram plotting
-│   └── inference.py          # Unified inference engine
-├── tests/
-│   ├── test_loaders.py
-│   ├── test_ewc.py
-│   ├── test_uncertainty.py
-│   └── test_visualization.py
-├── train_baseline.py         # Baseline YOLOv8 training on Waymo
-├── train_continual.py        # Continual learning with EWC on nuScenes
-├── evaluate.py               # Unified evaluation & reporting script
-├── docker-compose.yml        # Docker composition manifest
-├── Dockerfile.api            # Dockerfile for FastAPI backend
-├── Dockerfile.ui             # Dockerfile for Streamlit frontend
-├── requirements.txt          # Python dependencies
-└── README.md
-```
-
----
-
 ## 🚀 Quickstart Guide
 
 ### 1. Clone & Setup Environment
@@ -238,15 +189,15 @@ python train_baseline.py --config configs/waymo_config.yaml
 
 # Step 2: Continual Learning with EWC on nuScenes
 python train_continual.py --config configs/nuscenes_config.yaml \
-                          --checkpoint runs/waymo_baseline/weights/best.pt \
+                          --checkpoint runs/detect/runs/waymo_baseline/weights/best.pt \
                           --ewc_lambda 0.4
 
-# Step 3: Run Evaluation & Save Visualizations
-python evaluate.py --checkpoint runs/continual_ewc/weights/best.pt \
-                   --dataset nuscenes \
-                   --open_set \
-                   --save_visualizations
+# Step 3: Run Full Metrics Report (Detection + Continual + Open-Set)
+python run_all_metrics.py --checkpoint runs/detect/runs/continual_ewc/weights/best.pt \
+                          --baseline_checkpoint runs/detect/runs/waymo_baseline/weights/best.pt \
+                          --output_json metrics_results.json
 ```
+
 
 ### 4. Local Deployment (API & UI)
 

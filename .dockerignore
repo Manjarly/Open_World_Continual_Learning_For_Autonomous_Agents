@@ -3,6 +3,12 @@ venv/
 __pycache__/
 *.pyc
 .git/
+.pytest_cache/
+mlruns/
+.dvc/
 runs/
 data/
 *.pt
+*.tfrecord
+*.tar
+.DS_Store

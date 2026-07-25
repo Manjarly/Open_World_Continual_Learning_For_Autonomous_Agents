@@ -41,19 +41,18 @@ WAYMO_CLASS_MAP: Dict[int, str] = {
 LABEL_TO_IDX: Dict[str, int] = {v: i for i, v in enumerate(WAYMO_CLASS_MAP.values())}
 
 
-# ── Try importing the Waymo SDK ──────────────────────────────────────────────
+# ── Try importing the Waymo SDK / Protobuf ────────────────────────────────────
 try:
     import tensorflow as tf
     from waymo_open_dataset import dataset_pb2
-    from waymo_open_dataset.utils import frame_utils
     WAYMO_SDK_AVAILABLE = True
 except ImportError:
     WAYMO_SDK_AVAILABLE = False
     logger.warning(
-        "waymo-open-dataset SDK not found. "
-        "Install with: pip install waymo-open-dataset-tf-2-12-0\n"
+        "waymo-open-dataset protobuf not found. "
         "Loader will run in MOCK mode for development/testing."
     )
+
 
 
 class WaymoLoader:
@@ -126,52 +125,57 @@ class WaymoLoader:
             raise RuntimeError("Waymo SDK not installed.")
 
         frames = []
-        dataset = tf.data.TFRecordDataset(str(tfrecord_path), compression_type="")
+        try:
+            dataset = tf.data.TFRecordDataset(str(tfrecord_path), compression_type="")
+            for raw_bytes in dataset:
+                frame = dataset_pb2.Frame()
+                frame.ParseFromString(raw_bytes.numpy())
 
-        for raw_bytes in dataset:
-            frame = dataset_pb2.Frame()
-            frame.ParseFromString(raw_bytes.numpy())
-
-            # Find the requested camera image
-            camera_image = None
-            for img in frame.images:
-                if img.name == self.camera_name:
-                    camera_image = img
-                    break
-            if camera_image is None:
-                continue
-
-            # Decode JPEG
-            pil_img = Image.open(io.BytesIO(camera_image.image))
-            img_w, img_h = pil_img.size
-
-            # Collect 2D labels for this camera
-            labels = []
-            for cam_label in frame.camera_labels:
-                if cam_label.name != self.camera_name:
+                # Find the requested camera image
+                camera_image = None
+                for img in frame.images:
+                    if img.name == self.camera_name:
+                        camera_image = img
+                        break
+                if camera_image is None:
                     continue
-                for label in cam_label.labels:
-                    cls_name = WAYMO_CLASS_MAP.get(label.type)
-                    if cls_name is None:
-                        continue
-                    b = label.box
-                    cx_n, cy_n, w_n, h_n = self._bbox_to_yolo(
-                        b.center_x, b.center_y, b.length, b.width,
-                        img_w, img_h
-                    )
-                    labels.append({
-                        "class_idx": LABEL_TO_IDX[cls_name],
-                        "cx": cx_n, "cy": cy_n, "w": w_n, "h": h_n,
-                    })
 
-            frame_id = f"{frame.context.name}_{frame.timestamp_micros}"
-            frames.append({
-                "frame_id": frame_id,
-                "image": pil_img,
-                "labels": labels,
-            })
+                # Decode JPEG
+                pil_img = Image.open(io.BytesIO(camera_image.image))
+                img_w, img_h = pil_img.size
+
+                # Collect 2D labels for this camera
+                labels = []
+                for cam_label in frame.camera_labels:
+                    if cam_label.name != self.camera_name:
+                        continue
+                    for label in cam_label.labels:
+                        cls_name = WAYMO_CLASS_MAP.get(label.type)
+                        if cls_name is None:
+                            continue
+                        b = label.box
+                        cx_n, cy_n, w_n, h_n = self._bbox_to_yolo(
+                            b.center_x, b.center_y, b.length, b.width,
+                            img_w, img_h
+                        )
+                        labels.append({
+                            "class_idx": LABEL_TO_IDX[cls_name],
+                            "cx": cx_n, "cy": cy_n, "w": w_n, "h": h_n,
+                        })
+
+                frame_id = f"{frame.context.name}_{frame.timestamp_micros}"
+                frames.append({
+                    "frame_id": frame_id,
+                    "image": pil_img,
+                    "labels": labels,
+                })
+        except Exception as e:
+            logger.warning(f"Reached end of readable records in ({tfrecord_path.name}): {e}")
+
+
 
         return frames
+
 
     # ── Mock mode (no SDK) ───────────────────────────────────────────────────
 

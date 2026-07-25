@@ -1,0 +1,35 @@
+# Python & Byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments & Local Config
+venv/
+.venv/
+env/
+.env
+.vscode/
+.idea/
+.DS_Store
+
+# Datasets & Heavy Raw Files
+data/waymo/
+data/nuscenes/
+*.tfrecord
+*.tar
+*.zip
+*.tar.gz
+
+# Model Weights, Training Runs & MLflow Logs
+runs/
+mlruns/
+*.pt
+*.onnx
+*.engine
+
+# OS generated files
+.DS_Store
+Thumbs.db

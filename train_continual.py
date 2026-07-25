@@ -360,7 +360,7 @@ def train(cfg: dict, checkpoint: str, smoke_test: bool = False):
         forgetting    = {}
 
     elapsed = time.time() - t0
-    best_ckpt = Path("runs") / checkpoint_name / "weights" / "best.pt"
+    resolved_ckpt = detector._resolve_best_ckpt(None, checkpoint_name) or Path("runs") / checkpoint_name / "weights" / "best.pt"
 
     # ── 8. Summary ─────────────────────────────────────────────────────────
     logger.info("\n" + "=" * 60)
@@ -370,7 +370,8 @@ def train(cfg: dict, checkpoint: str, smoke_test: bool = False):
     logger.info(f"  nuScenes mAP@50-95: {metrics.get('mAP50_95', 0.0):.4f}")
     logger.info(f"  EWC Lambda:         {ewc_lambda}")
     logger.info(f"  Forgetting (Δ mAP): {forgetting.get('forgetting', 'N/A')}")
-    logger.info(f"  Checkpoint → {best_ckpt}")
+    logger.info(f"  Checkpoint → {resolved_ckpt}")
+
     if openset_stats:
         logger.info(f"  Unknown rate:       {openset_stats.get('unknown_rate', 0.0):.3f}")
         logger.info(f"  Uncertainty mean:   {openset_stats.get('uncertainty_mean', 0.0):.3f}")

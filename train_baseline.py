@@ -186,7 +186,7 @@ def train(cfg: dict, smoke_test: bool = False):
     logger.info(f"Training complete in {elapsed/60:.1f} min")
 
     # ── 5. Report results ──────────────────────────────────────────────────
-    best_ckpt = Path("runs") / checkpoint_name / "weights" / "best.pt"
+    resolved_ckpt = detector._resolve_best_ckpt(None, checkpoint_name) or Path("runs") / checkpoint_name / "weights" / "best.pt"
 
     logger.info("\n" + "=" * 60)
     logger.info("  Phase 1 Results")
@@ -195,16 +195,17 @@ def train(cfg: dict, smoke_test: bool = False):
     logger.info(f"  mAP@50-95:   {metrics.get('mAP50_95', 0.0):.4f}")
     logger.info(f"  Precision:   {metrics.get('precision', 0.0):.4f}")
     logger.info(f"  Recall:      {metrics.get('recall',    0.0):.4f}")
-    logger.info(f"  Checkpoint → {best_ckpt}")
+    logger.info(f"  Checkpoint → {resolved_ckpt}")
     logger.info("=" * 60)
 
-    if not best_ckpt.exists():
+    if not resolved_ckpt.exists():
         logger.warning(
             "Best checkpoint not found. "
             "Ensure training ran with sufficient data and epochs."
         )
 
-    return metrics, str(best_ckpt)
+    return metrics, str(resolved_ckpt)
+
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
