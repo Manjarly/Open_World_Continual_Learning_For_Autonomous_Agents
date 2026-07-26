@@ -30,7 +30,7 @@ dataset:
     - lidar           # Top LiDAR (optional projection)
 
 training:
-  epochs: 50
+  epochs: 30
   batch_size: 16
   checkpoint_name: "waymo_baseline"
 
