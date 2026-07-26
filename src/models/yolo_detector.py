@@ -211,7 +211,7 @@ class YOLODetector:
         """Run validation and return mAP metrics."""
         if self.model is None:
             raise RuntimeError("Model not initialized.")
-        results = self.model.val(data=dataset_yaml, imgsz=img_size, device=self.device)
+        results = self.model.val(data=dataset_yaml, imgsz=img_size, device=self.device, plots=False)
         return self._extract_metrics(results)
 
     # ── Inference ─────────────────────────────────────────────────────────────
