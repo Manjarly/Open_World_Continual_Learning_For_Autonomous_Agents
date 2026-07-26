@@ -14,6 +14,7 @@ Usage:
     results = detector.predict("path/to/image.jpg")
 """
 
+import os
 import logging
 import shutil
 from pathlib import Path
@@ -43,6 +44,38 @@ def _try_import_mlflow():
         return None
 
 
+def resolve_device(device_str: str = "auto") -> str:
+    """
+    Automatically resolve computing device (CUDA > MPS > CPU) while strictly capping GPU memory at 80%.
+    """
+    dev = device_str.lower() if device_str else "auto"
+    
+    if dev != "auto":
+        if dev == "mps" and torch.backends.mps.is_available():
+            os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.8"
+            return "mps"
+        elif dev == "cuda" and torch.cuda.is_available():
+            try:
+                torch.cuda.set_per_process_memory_fraction(0.80)
+            except Exception:
+                pass
+            return "cuda"
+        elif dev == "cpu":
+            return "cpu"
+
+    # Auto resolution
+    if torch.cuda.is_available():
+        try:
+            torch.cuda.set_per_process_memory_fraction(0.80)
+        except Exception:
+            pass
+        return "cuda"
+    elif torch.backends.mps.is_available():
+        os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.8"
+        return "mps"
+    return "cpu"
+
+
 class YOLODetector:
     """
     YOLOv8-based object detector.
@@ -60,14 +93,15 @@ class YOLODetector:
         model_size: str = "yolov8m",
         num_classes: int = 4,
         checkpoint: Optional[str] = None,
-        device: str = "cuda",
+        device: str = "auto",
     ):
         assert model_size in self.VALID_SIZES, \
             f"model_size must be one of {self.VALID_SIZES}"
 
         self.model_size  = model_size
         self.num_classes = num_classes
-        self.device      = device if torch.cuda.is_available() else "cpu"
+        self.device      = resolve_device(device)
+        logger.info(f"YOLODetector initialized on device: {self.device} (GPU Memory Cap: <80%)")
 
         if not ULTRALYTICS_AVAILABLE:
             logger.error("Ultralytics YOLO not available. Cannot create model.")

@@ -10,7 +10,7 @@ project:
 
 training:
   seed: 42
-  device: "cuda"           # "cpu" for CPU-only
+  device: "auto"           # "auto" (CUDA > MPS > CPU) capped at <80% GPU memory
   epochs: 50
   batch_size: 16
   num_workers: 4
