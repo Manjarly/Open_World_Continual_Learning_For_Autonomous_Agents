@@ -79,8 +79,10 @@ Detections with uncertainty scores exceeding the calibrated threshold are automa
 | **Source Domain** | Waymo Open Dataset | San Francisco, Mountain View, Phoenix | Vehicle, Pedestrian, Cyclist, Sign |
 | **Target Domain** | nuScenes | Boston, Singapore | Vehicle, Pedestrian, Cyclist, Barrier |
 
-### Data Preprocessing & Versioning
-- **Parsing & Conversion**: `src/data/waymo_loader.py` and `src/data/nuscenes_loader.py` parse raw sensor annotations into standard YOLO bounding box formats (`[x_center, y_center, width, height]`).
+### Data Preprocessing, Class Equalization & Hardware Acceleration
+- **Equalized Class Distribution (1:1:1:1 Ratio)**: `src/data/waymo_loader.py` enforces a 25% equal annotation ratio (~1,000 instances each for **Vehicle**, **Pedestrian**, **Cyclist**, and **Sign**), eliminating rare-class recall suppression.
+- **Automatic GPU Acceleration**: `src/models/yolo_detector.py` automatically detects and routes training to Apple Silicon Metal GPU (`mps`) on Mac and CUDA GPU on Linux/NVIDIA systems.
+- **Strict <80% GPU Resource Cap**: Enforces a safety threshold (`PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.80` for MPS / `torch.cuda.set_per_process_memory_fraction(0.80)` for CUDA) preventing memory overflow or system throttling.
 - **Data Versioning (DVC)**: Processed dataset splits under `data/processed/` are tracked using DVC for reproducible data pipelines across training environments.
 
 ---
