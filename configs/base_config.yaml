@@ -20,7 +20,7 @@ training:
   patience: 10             # Early stopping patience
 
 model:
-  architecture: "yolov8m"  # yolov8n / yolov8s / yolov8m / yolov8l
+  architecture: "yolo11m"  # yolo11n / yolo11s / yolo11m / yolo11l / yolo11x
   pretrained: true
   confidence_threshold: 0.25
   iou_threshold: 0.45

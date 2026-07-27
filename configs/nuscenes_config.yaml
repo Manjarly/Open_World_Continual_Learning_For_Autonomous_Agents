@@ -7,9 +7,9 @@ defaults:
 
 dataset:
   name: "nuscenes"
-  raw_path: "data/nuscenes/"
+  raw_path: "data/nuscenes/raw"
   processed_path: "data/processed/nuscenes/"
-  version: "v1.0-trainval"   # or "v1.0-mini" for quick runs
+  version: "v1.0-mini"
   splits:
     train: "data/processed/nuscenes/train/"
     val:   "data/processed/nuscenes/val/"

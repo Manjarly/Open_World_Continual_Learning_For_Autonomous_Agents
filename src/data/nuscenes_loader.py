@@ -231,7 +231,7 @@ class NuScenesLoader:
     def process(self) -> Dict[str, int]:
         counts = {"train": 0, "val": 0, "test": 0}
 
-        if NUSCENES_SDK_AVAILABLE and (self.raw_dir / "v1.0-trainval").exists():
+        if NUSCENES_SDK_AVAILABLE and (self.raw_dir / self.version).exists():
             all_frames = self._process_real()
         else:
             logger.warning("nuScenes SDK or data not found — using mock mode.")

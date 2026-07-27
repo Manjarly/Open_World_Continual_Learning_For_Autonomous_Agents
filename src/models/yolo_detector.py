@@ -86,19 +86,23 @@ class YOLODetector:
       - Probability vector extraction (needed for EWC & open-set)
     """
 
-    VALID_SIZES = {"yolov8n", "yolov8s", "yolov8m", "yolov8l", "yolov8x"}
+    VALID_SIZES = {
+        "yolov8n", "yolov8s", "yolov8m", "yolov8l", "yolov8x",
+        "yolo11n", "yolo11s", "yolo11m", "yolo11l", "yolo11x",
+    }
 
     def __init__(
         self,
-        model_size: str = "yolov8m",
+        model_size: str = "yolo11m",
         num_classes: int = 4,
         checkpoint: Optional[str] = None,
         device: str = "auto",
     ):
-        assert model_size in self.VALID_SIZES, \
+        clean_size = model_size.replace(".pt", "")
+        assert clean_size in self.VALID_SIZES, \
             f"model_size must be one of {self.VALID_SIZES}"
 
-        self.model_size  = model_size
+        self.model_size  = clean_size
         self.num_classes = num_classes
         self.device      = resolve_device(device)
         logger.info(f"YOLODetector initialized on device: {self.device} (GPU Memory Cap: <80%)")
@@ -112,8 +116,8 @@ class YOLODetector:
             logger.info(f"Loading checkpoint: {checkpoint}")
             self.model = YOLO(checkpoint)
         else:
-            logger.info(f"Initializing pretrained {model_size}")
-            self.model = YOLO(f"{model_size}.pt")
+            logger.info(f"Initializing pretrained {clean_size}.pt")
+            self.model = YOLO(f"{clean_size}.pt")
 
     # ── Training ─────────────────────────────────────────────────────────────
 
