@@ -53,6 +53,7 @@ def resolve_device(device_str: str = "auto") -> str:
     if dev != "auto":
         if dev == "mps" and torch.backends.mps.is_available():
             os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.8"
+            os.environ["PYTORCH_MPS_LOW_WATERMARK_RATIO"]  = "0.6"
             return "mps"
         elif dev == "cuda" and torch.cuda.is_available():
             try:
@@ -72,6 +73,7 @@ def resolve_device(device_str: str = "auto") -> str:
         return "cuda"
     elif torch.backends.mps.is_available():
         os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.8"
+        os.environ["PYTORCH_MPS_LOW_WATERMARK_RATIO"]  = "0.6"
         return "mps"
     return "cpu"
 
